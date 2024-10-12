@@ -208,13 +208,21 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
     <script>
+        const fileInput = document.getElementById('photo-upload');
+        const fileLabel = document.querySelector('.custom-file-label');
+    
+        fileInput.addEventListener('change', function() {
+            const customMessage = this.files[0] ? 'File selected!' : 'No file chosen';
+            fileLabel.textContent = customMessage;
+        });
+    
         const canvas = new fabric.Canvas('canvas', { preserveObjectStacking: true });
         const canvasSize = 300;
         const resolutionScale = 4; // Scale factor for high-resolution export
-
+    
         canvas.setWidth(canvasSize);
         canvas.setHeight(canvasSize);
-
+    
         const framePaths = {
             frame: {
                 '7': 'images/GRADE 7.png',
@@ -225,21 +233,21 @@
                 '12': 'images/GRADE 12.png'
             }
         };
-
+    
         document.getElementById('apply-frame').addEventListener('click', () => {
             const photoFile = document.getElementById('photo-upload').files[0];
             const role = document.getElementById('role').value;
             const frameUrl = framePaths['frame'][role];
-
+    
             if (photoFile && frameUrl) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     fabric.Image.fromURL(event.target.result, (photo) => {
                         canvas.clear();
-
+    
                         const photoAspectRatio = photo.width / photo.height;
                         const canvasAspectRatio = canvas.width / canvas.height;
-                        
+    
                         // Adjust aspect ratio
                         let scaleX, scaleY;
                         if (photoAspectRatio > canvasAspectRatio) {
@@ -249,7 +257,7 @@
                             scaleY = canvas.height / photo.height;
                             scaleX = scaleY;
                         }
-                        
+    
                         photo.set({
                             scaleX: scaleX,
                             scaleY: scaleY,
@@ -259,7 +267,7 @@
                             evented: true
                         });
                         canvas.add(photo);
-
+    
                         fabric.Image.fromURL(frameUrl, (frame) => {
                             frame.set({
                                 selectable: false,
@@ -269,7 +277,7 @@
                             });
                             canvas.add(frame);
                             frame.center();
-                            frame.sendToFront(); // <==POTANGINAA
+                            frame.sendToFront(); 
                         });
                     });
                 };
@@ -278,22 +286,21 @@
                 alert('Please upload a photo and select both a theme and a role.');
             }
         });
-
+    
         document.getElementById('download').addEventListener('click', () => {
-            // Pano ya man
             const originalWidth = canvas.getWidth();
             const originalHeight = canvas.getHeight();
-
+    
             canvas.setWidth(canvasSize * resolutionScale);
             canvas.setHeight(canvasSize * resolutionScale);
             canvas.setZoom(resolutionScale);
-
+    
             const dataURL = canvas.toDataURL('image/png');
-
+    
             canvas.setWidth(originalWidth);
             canvas.setHeight(originalHeight);
             canvas.setZoom(1);
-
+    
             const link = document.createElement('a');
             link.href = dataURL;
             link.download = 'DP-Blast-ni-berrttaa.png';
@@ -301,6 +308,6 @@
             link.click();
             document.body.removeChild(link);
         });
-    </script>
+    </script>    
 </body>
 </html>
